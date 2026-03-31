@@ -26,9 +26,14 @@ def run_pipeline(
     output_dir: str,
     backend: str = "openvins",
     progress_cb: Callable[[float], None] | None = None,
+    max_frames: int | None = None,
 ) -> dict:
     """
     Run the full VIO + perception pipeline.
+
+    Args:
+        max_frames: Process only this many frames (None = all frames).
+                    Useful for quick test runs on long videos.
 
     Returns dict with: frame_count, duration_s, rpe_rmse, poses
     """
@@ -40,20 +45,30 @@ def run_pipeline(
     # Stage 1 — Ingest
     logger.info("Stage 1: Ingesting data")
     ingest_result = ingest(video_path, imu_path)
+    total = ingest_result.frame_count
+
+    if max_frames and max_frames < total:
+        logger.info("Limiting to %d frames (%.0f%% of %d)", max_frames, max_frames / total * 100, total)
+        total = max_frames
+
     if progress_cb:
         progress_cb(10.0)
 
     # Stage 2+3 — VIO
     logger.info("Stage 2-3: Running VIO (%s)", backend)
     vio_result = run_vio(video_path, imu_path, backend=backend)
+    if max_frames:
+        vio_result.poses = vio_result.poses[:max_frames]
     if progress_cb:
         progress_cb(40.0)
 
     # Stage 4 — Perception (per-frame)
-    logger.info("Stage 4: Running perception on %d frames", ingest_result.frame_count)
+    logger.info("Stage 4: Running perception on %d frames", total)
     perceptions = []
-    total = ingest_result.frame_count
     for idx, ts, frame in iterate_frames(Path(video_path)):
+        if max_frames and idx >= max_frames:
+            break
+
         perc = perceive_frame(idx, frame, depth_output_dir=depth_dir)
         perceptions.append(perc)
 
@@ -73,9 +88,13 @@ def run_pipeline(
     elapsed = time.time() - start
     logger.info("Pipeline complete in %.1fs — %d frames", elapsed, len(fused))
 
+    duration_s = ingest_result.duration_s
+    if max_frames and ingest_result.frame_count > 0:
+        duration_s = duration_s * (max_frames / ingest_result.frame_count)
+
     return {
         "frame_count": len(fused),
-        "duration_s": ingest_result.duration_s,
+        "duration_s": duration_s,
         "rpe_rmse": None,
         "poses": fused,
         "elapsed_s": elapsed,
@@ -92,13 +111,14 @@ def main():
     parser.add_argument("--video", required=True, help="Path to video.mp4")
     parser.add_argument("--imu", required=True, help="Path to imu.csv")
     parser.add_argument("--out", required=True, help="Output directory")
-    parser.add_argument("--backend", default="openvins", choices=["openvins", "basalt"])
+    parser.add_argument("--backend", default="openvins", choices=["openvins", "basalt", "python"])
+    parser.add_argument("--max-frames", type=int, default=None, help="Limit processing to N frames (for quick tests)")
     args = parser.parse_args()
 
     def print_progress(pct: float):
         print(f"\rProgress: {pct:.1f}%", end="", flush=True)
 
-    result = run_pipeline(args.video, args.imu, args.out, args.backend, print_progress)
+    result = run_pipeline(args.video, args.imu, args.out, args.backend, print_progress, max_frames=args.max_frames)
     print(f"\nDone — {result['frame_count']} frames in {result['elapsed_s']:.1f}s")
 
 

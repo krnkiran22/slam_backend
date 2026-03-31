@@ -44,7 +44,7 @@ def _update_run(run_id: str, **fields):
 
 
 @celery.task(bind=True, max_retries=1)
-def process_run(self, run_id: str, video_path: str, imu_path: str):
+def process_run(self, run_id: str, video_path: str, imu_path: str, max_frames: int | None = 500):
     from api.models import RunStatus
 
     output_dir = os.path.join(os.path.dirname(video_path), "output")
@@ -58,7 +58,7 @@ def process_run(self, run_id: str, video_path: str, imu_path: str):
             self.update_state(state="PROGRESS", meta={"progress": pct})
 
         from pipeline.run import run_pipeline
-        result = run_pipeline(video_path, imu_path, output_dir, progress_cb=on_progress)
+        result = run_pipeline(video_path, imu_path, output_dir, progress_cb=on_progress, max_frames=max_frames)
 
         _update_run(
             run_id,

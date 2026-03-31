@@ -1,0 +1,17 @@
+# ML / GPU dependencies — install on GPU workers (RunPod / Modal) only
+# NOT used on Railway API deployment
+-r requirements.txt
+
+opencv-python>=4.9.0
+torch>=2.2.0
+torchvision>=0.17.0
+ultralytics>=8.1.0
+evo>=1.29.0
+
+# mmcv must be installed as a pre-built wheel — match your torch + CUDA version:
+# CUDA 11.8 + torch 2.2: pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu118/torch2.2/index.html
+# CUDA 12.1 + torch 2.2: pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.2/index.html
+mmpose>=1.3.0
+
+# Depth Anything v2 — install from source:
+# git clone https://github.com/DepthAnything/Depth-Anything-V2 && pip install -e Depth-Anything-V2

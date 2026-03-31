@@ -18,7 +18,16 @@ echo "[2/5] Setting up Python environment..."
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip setuptools wheel
+
+# Install core deps
 pip install -r requirements.txt
+
+# Install ML deps (GPU worker only) — mmcv needs special wheel URL
+# Adjust cu118/cu121 and torch version to match your GPU environment
+TORCH_VERSION=$(python -c "import torch; print(torch.__version__.split('+')[0])" 2>/dev/null || echo "2.2.0")
+CUDA_TAG="cu118"  # change to cu121 for CUDA 12.1
+pip install mmcv==2.1.0 -f "https://download.openmmlab.com/mmcv/dist/${CUDA_TAG}/torch${TORCH_VERSION}/index.html"
+pip install mmpose>=1.3.0 ultralytics>=8.1.0 evo>=1.29.0
 
 # Docker services
 echo "[3/5] Starting local services..."

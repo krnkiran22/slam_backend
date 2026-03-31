@@ -1,0 +1,33 @@
+use_stereo: false
+max_cameras: 1
+
+camera0:
+  camera_model: pinhole
+  distortion_model: radtan
+  resolution: [1920, 1080]
+  intrinsics: [718.90196364, 716.33626950, 960.01857437, 558.31079911]
+  distortion_coeffs: [-0.28182606, 0.07391488, 0.00031393, 0.00090297]
+  T_cam_imu:
+    - [ 0.5488140373,  0.4040019011, -0.7318371516, -0.0003648381]
+    - [-0.8169342334,  0.4448444651, -0.3670583881, -0.0000230148]
+    - [ 0.1772614196,  0.7993096182,  0.5741798702, -0.0002253224]
+    - [ 0.0000000000,  0.0000000000,  0.0000000000,  1.0000000000]
+  timeshift_cam_imu: 0.0
+
+imu_rate: 30
+cam_rate: 30
+
+imu_noises:
+  gyroscope_noise_density: 0.005
+  accelerometer_noise_density: 0.01
+  gyroscope_random_walk: 0.0001
+  accelerometer_random_walk: 0.0002
+
+num_pts: 200
+fast_threshold: 20
+grid_x: 5
+grid_y: 5
+min_px_dist: 10
+
+use_klt: true
+klt_win_size: 15

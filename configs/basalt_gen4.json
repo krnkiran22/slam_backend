@@ -1,0 +1,37 @@
+{
+  "value0": {
+    "config.optical_flow_type": "frame_to_frame",
+    "config.optical_flow_detection_grid_size": 50,
+    "config.optical_flow_max_recovered_dist2": 0.09,
+    "config.optical_flow_pattern": 51,
+    "config.optical_flow_max_iterations": 5,
+    "config.optical_flow_epipolar_error": 0.005,
+    "config.optical_flow_levels": 3,
+    "config.vio_max_states": 3,
+    "config.vio_max_kfs": 7,
+    "config.vio_min_frames_after_kf": 5,
+    "config.vio_new_kf_keypoints_thresh": 0.7,
+    "config.vio_max_iterations": 7,
+    "config.vio_enforce_realtime": false,
+    "config.mapper_obs_min_frame_dist": 5
+  },
+  "camera": {
+    "model": "pinhole-radtan",
+    "resolution": [1920, 1080],
+    "intrinsics": [718.90196364, 716.33626950, 960.01857437, 558.31079911],
+    "distortion": [-0.28182606, 0.07391488, 0.00031393, 0.00090297],
+    "T_cam_imu": [
+      [0.5488140373, 0.4040019011, -0.7318371516, -0.0003648381],
+      [-0.8169342334, 0.4448444651, -0.3670583881, -0.0000230148],
+      [0.1772614196, 0.7993096182, 0.5741798702, -0.0002253224],
+      [0.0, 0.0, 0.0, 1.0]
+    ]
+  },
+  "imu": {
+    "rate_hz": 30,
+    "gyro_noise_std": 0.005,
+    "accel_noise_std": 0.01,
+    "gyro_bias_std": 0.0001,
+    "accel_bias_std": 0.0002
+  }
+}

@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="block", ENV{ID_FS_TYPE}=="vfat", \
+  RUN+="/usr/local/bin/build_pipeline_trigger.sh %E{DEVNAME}"

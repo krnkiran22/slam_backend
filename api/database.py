@@ -7,7 +7,16 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://buildai:buildai@localhost:5432/buildai")
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+# Railway injects DATABASE_URL with postgres:// prefix — SQLAlchemy needs postgresql://
+DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_size=5,
+    max_overflow=10,
+    connect_args={"sslmode": "require"} if "railway" in DATABASE_URL else {},
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

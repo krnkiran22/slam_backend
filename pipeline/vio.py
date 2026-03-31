@@ -211,26 +211,26 @@ def _run_python_vio(video_path: str, imu_path: str) -> VIOResult:
                             _, R_rel, t_rel, _ = cv2.recoverPose(
                                 E, pts_prev[inliers], pts_curr[inliers], new_K
                             )
-                            # Scale from IMU acceleration magnitude
                             accel_world = orientation.apply(accel_avg) - gravity
                             accel_mag = np.linalg.norm(accel_world)
-                            scale = min(accel_mag * dt * dt * 0.5, 0.05)
+                            # Walking speed ~1.4 m/s → ~0.047m per frame at 30fps
+                            # Use IMU acceleration to estimate scale
+                            scale = max(accel_mag * dt * 0.5, 0.01)
+                            scale = min(scale, 0.15)
                             visual_translation = t_rel.ravel() * scale
 
         # Fuse: use visual translation rotated into world frame
         R_world = orientation.as_matrix()
         translation_world = R_world @ visual_translation
 
-        # Integrate IMU acceleration for position (complementary with visual)
         accel_world = orientation.apply(accel_avg) - gravity
-        alpha = 0.7  # visual weight
         imu_pos_delta = accel_world * dt * dt * 0.5
 
         if np.linalg.norm(visual_translation) > 1e-6:
-            position += alpha * translation_world + (1.0 - alpha) * imu_pos_delta
-            velocity = velocity * 0.95 + translation_world / max(dt, 1e-6) * 0.05
+            position += 0.6 * translation_world + 0.4 * imu_pos_delta
+            velocity = velocity * 0.9 + translation_world / max(dt, 1e-6) * 0.1
         else:
-            velocity *= 0.98
+            velocity *= 0.95
             position += velocity * dt
 
         roll, pitch, yaw = orientation.as_euler("xyz")

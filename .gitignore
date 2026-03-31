@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Environment — never commit real credentials
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Pipeline outputs
+output/
+*.npy
+annotated_video.mp4
+
+# ML model weights
+*.pt
+*.pth
+*.onnx
+
+# Alembic compiled
+alembic/__pycache__/

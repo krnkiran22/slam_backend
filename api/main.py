@@ -27,6 +27,7 @@ app = FastAPI(
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://web-production-2f854.up.railway.app",
+    "https://slam-frontend-seven.vercel.app",
     os.getenv("FRONTEND_URL", ""),
 ]
 

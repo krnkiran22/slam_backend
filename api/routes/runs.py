@@ -68,6 +68,19 @@ async def create_run_upload(
     return run
 
 
+@router.get("/runs/{run_id}/video")
+def stream_video(run_id: UUID, db: Session = Depends(get_db)):
+    """Stream the original uploaded video for playback."""
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    video_path = Path(run.video_path)
+    if not video_path.exists():
+        raise HTTPException(status_code=404, detail="Video file not found")
+    return FileResponse(video_path, media_type="video/mp4")
+
+
 @router.get("/runs/{run_id}/output/{filename}")
 def download_output(run_id: UUID, filename: str, db: Session = Depends(get_db)):
     """Download output files (poses.json, annotated_video.mp4)."""

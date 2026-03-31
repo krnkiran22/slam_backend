@@ -1,8 +1,16 @@
 import os
+import sys
 import json
 import logging
+from pathlib import Path
 from celery import Celery
 from dotenv import load_dotenv
+
+# Ensure the backend root is on sys.path so `pipeline.*` imports work
+# regardless of how the worker process is launched (Railway, local, etc.)
+_backend_root = str(Path(__file__).resolve().parent.parent)
+if _backend_root not in sys.path:
+    sys.path.insert(0, _backend_root)
 
 load_dotenv()
 

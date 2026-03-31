@@ -24,16 +24,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://web-production-2f854.up.railway.app",
-    "https://slam-frontend-seven.vercel.app",
-    os.getenv("FRONTEND_URL", ""),
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[o for o in ALLOWED_ORIGINS if o],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

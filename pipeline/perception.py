@@ -28,10 +28,13 @@ class FramePerception:
 # ── Object Detection (YOLOv8) ──────────────────────────────────────────
 
 _yolo_model = None
+_yolo_unavailable = False
 
 
 def _get_yolo():
-    global _yolo_model
+    global _yolo_model, _yolo_unavailable
+    if _yolo_unavailable:
+        return None
     if _yolo_model is None:
         try:
             from ultralytics import YOLO
@@ -39,6 +42,7 @@ def _get_yolo():
             logger.info("Loaded YOLOv8n model")
         except ImportError:
             logger.warning("ultralytics not installed — object detection disabled")
+            _yolo_unavailable = True
             return None
     return _yolo_model
 
@@ -62,10 +66,13 @@ def detect_objects(frame: np.ndarray) -> list[Detection]:
 # ── Body Skeleton (ViTPose) ────────────────────────────────────────────
 
 _pose_model = None
+_pose_unavailable = False
 
 
 def _get_vitpose():
-    global _pose_model
+    global _pose_model, _pose_unavailable
+    if _pose_unavailable:
+        return None
     if _pose_model is None:
         try:
             from mmpose.apis import init_model
@@ -78,6 +85,7 @@ def _get_vitpose():
             logger.info("Loaded ViTPose model")
         except (ImportError, FileNotFoundError):
             logger.warning("mmpose/ViTPose not available — skeleton estimation disabled")
+            _pose_unavailable = True
             return None
     return _pose_model
 
@@ -107,10 +115,13 @@ def estimate_skeleton(frame: np.ndarray, bboxes: list[list[float]]) -> dict | No
 # ── Depth Estimation (Depth Anything v2) ───────────────────────────────
 
 _depth_model = None
+_depth_unavailable = False
 
 
 def _get_depth_model():
-    global _depth_model
+    global _depth_model, _depth_unavailable
+    if _depth_unavailable:
+        return None
     if _depth_model is None:
         try:
             import torch
@@ -127,6 +138,7 @@ def _get_depth_model():
             logger.info("Loaded Depth Anything v2 model")
         except (ImportError, FileNotFoundError):
             logger.warning("Depth Anything v2 not available — depth estimation disabled")
+            _depth_unavailable = True
             return None
     return _depth_model
 
